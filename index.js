@@ -9,6 +9,9 @@ app.use(express.json());
 const articleRouter = require('./routers/article');
 app.use('/', articleRouter);
 
+const authorRouter = require('./routers/author');
+app.use('/', authorRouter);
+
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
 });
