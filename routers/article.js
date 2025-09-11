@@ -20,4 +20,9 @@ router.patch('/article/edit/:id', (req, res) => {
     ArticleController.updateArticle(req, res);
 });
 
+//kustutamine artikli
+router.delete('/article/delete/:id', (req, res) =>{
+    ArticleController.deleteArticle(req, res);
+});
+
 module.exports = router;

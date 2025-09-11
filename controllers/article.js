@@ -62,6 +62,25 @@ class ArticleController {
             res.status(500).json({error: error.message});
         }
     }
+
+    async deleteArticle(req, res) {
+    try {
+        const articleId = req.params.id;
+
+        // Kustuta artikkel andmebaasist
+        const affectedRows = await articleModel.delete(articleId);
+
+        if (affectedRows === 0) {
+            return res.status(404).json({ message: 'Article not found' });
+        }
+
+        res.status(200).json({ message: 'Article deleted successfully' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+}
+
+        
 }
 
 module.exports = ArticleController
