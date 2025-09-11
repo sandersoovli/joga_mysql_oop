@@ -3,6 +3,8 @@ const express = require('express');
 //import articleRouter from './routers/article.js';
 
 const app = express();
+app.use(express.urlencoded({ extended: true }));
+
 const PORT = 3000;
 app.use(express.json());
 
