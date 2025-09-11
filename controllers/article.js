@@ -33,11 +33,35 @@ class ArticleController {
         };
         const articleId = await articleModel.create(newArticle);
         res.status(201).json({
-            message: 'created article with id ${articleId}  ', 
+            message: `created article with id ${articleId}  `, 
             article: {id: articleId, ...newArticle } 
         }); 
 
     } 
+    async updateArticle(req, res) {
+        try {
+            const articleId = req.params.id;
+
+            //uued andmed bodyis
+            const updatedData ={
+                name: req.body.name,
+                slug: req.body.slug,
+                image: req.body.image,
+                body: req.body.body,
+                published: new Date().toISOString().slice(0, 19).replace('T', ' '),
+                author_id: req.body.author_id
+            };
+            
+            const affectedRows = await articleModel.update(articleId, updatedData); 
+
+            if (affectedRows === 0) {
+                return res.status(404).json({message: 'Article not found'});
+            }
+            res.status(200).json({message: 'Article updated successfully'});
+        } catch (error) {
+            res.status(500).json({error: error.message});
+        }
+    }
 }
 
 module.exports = ArticleController

@@ -15,4 +15,9 @@ router.get('/article/:slug', (req, res) =>{
     ArticleController.getArticleBySlug(req, res);
 });
 
+// uus route artikli muutmiseks
+router.patch('/article/edit/:id', (req, res) => {
+    ArticleController.updateArticle(req, res);
+});
+
 module.exports = router;
