@@ -4,17 +4,44 @@ const userModel = new userDbModel();
 
 class UserController {
     async register(req, res) {
+        console.log(req.body); // kontrollib, mis tuleb
+        const { username, email, password } = req.body;
+
+        // Kontroll, et kõik väljad oleks täidetud
+        if (!username || !email || !password) {
+            return res.status(400).json({ error: "Kõik väljad on kohustuslikud" });
+        }
+
         try {
-            const cryptPassword = await bcrypt.hash(req.body.password, 10);
+            // Kontroll, kas kasutajanimi on juba olemas
+            const existingUser = await userModel.findByUsername(username);
+            if (existingUser) {
+                return res.status(400).json({ message: 'Username already exists' });
+            }
+
+            // Kontrolli parooli pikkust
+            if (password.length < 6) {
+                return res.status(400).json({ message: 'Password must be at least 6 characters long' });
+            }
+
+            // Kontrolli parooli keerukust
+            const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$/;
+            if (!passwordRegex.test(password)) {
+                return res.status(400).json({ message: 'The password must contain uppercase and lowercase letters, numbers, and symbols.' });
+            }
+
+            // Parooli krüpteerimine
+            const cryptPassword = await bcrypt.hash(password, 10);
             const registeredId = await userModel.create({
-                username: req.body.username,
-                email: req.body.email,
+                username,
+                email,
                 password: cryptPassword
             });
 
             if (registeredId) {
                 const userData = await userModel.findById(registeredId);
 
+                // Loo sessioon
                 req.session.user = {
                     username: userData.username,
                     user_id: userData.id
@@ -33,4 +60,4 @@ class UserController {
     }
 }
 
-module.exports = new UserController;
+module.exports = new UserController();

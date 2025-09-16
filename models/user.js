@@ -13,6 +13,14 @@ class User extends BaseSQLModel {
     async create(data) {
         return await super.create(data);
     }
+    //kasutajanime kontroll
+    async findByUsername(username) {
+    const sql = 'SELECT * FROM users WHERE username = ? LIMIT 1';
+    const result = await this.executeQuery(sql, [username]);
+    const rows = Array.isArray(result) ? result[0] : [];
+    return rows || null;
+}
+
 }
 
 module.exports = User;
