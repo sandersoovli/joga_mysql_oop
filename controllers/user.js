@@ -3,57 +3,42 @@ const userDbModel = require('../models/user');
 const userModel = new userDbModel();
 
 class UserController {
-    async register(req, res) {
-        console.log(req.body); // kontrollib, mis tuleb
-        const { username, email, password } = req.body;
+    // olemasolev register meetod jääb alles
 
-        // Kontroll, et kõik väljad oleks täidetud
-        if (!username || !email || !password) {
-            return res.status(400).json({ error: "Kõik väljad on kohustuslikud" });
+    // -------------- LOGIN --------------
+    async login(req, res) {
+        const { username, password } = req.body;
+
+        // Kontroll, et väljad on täidetud
+        if (!username || !password) {
+            return res.status(400).json({ error: "Kasutajanimi ja parool on kohustuslikud" });
         }
 
         try {
-            // Kontroll, kas kasutajanimi on juba olemas
-            const existingUser = await userModel.findByUsername(username);
-            if (existingUser) {
-                return res.status(400).json({ message: 'Username already exists' });
+            // Leia kasutaja andmebaasist kasutajanime järgi
+            const user = await userModel.findByUsername(username);
+
+            if (!user) {
+                return res.status(404).json({ error: "Kasutajat ei leitud" });
             }
 
-            // Kontrolli parooli pikkust
-            if (password.length < 6) {
-                return res.status(400).json({ message: 'Password must be at least 6 characters long' });
+            // Võrdle sisestatud parooli krüpteeritud parooliga
+            const passwordMatch = await bcrypt.compare(password, user.password);
+            if (!passwordMatch) {
+                return res.status(401).json({ error: "Vale parool" });
             }
 
-            // Kontrolli parooli keerukust
-            const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$/;
-            if (!passwordRegex.test(password)) {
-                return res.status(400).json({ message: 'The password must contain uppercase and lowercase letters, numbers, and symbols.' });
-            }
+            // Kui kõik klapib, loo sessioon
+            req.session.user = {
+                username: user.username,
+                user_id: user.id
+            };
 
-            // Parooli krüpteerimine
-            const cryptPassword = await bcrypt.hash(password, 10);
-            const registeredId = await userModel.create({
-                username,
-                email,
-                password: cryptPassword
+            res.json({
+                message: "Sisse logitud edukalt",
+                user_session: req.session.user
             });
 
-            if (registeredId) {
-                const userData = await userModel.findById(registeredId);
-
-                // Loo sessioon
-                req.session.user = {
-                    username: userData.username,
-                    user_id: userData.id
-                };
-
-                res.json({
-                    message: 'New user is registered',
-                    user_session: req.session.user
-                });
-            } else {
-                res.status(500).json({ message: 'User registration failed' });
-            }
         } catch (error) {
             res.status(500).json({ error: error.message });
         }
