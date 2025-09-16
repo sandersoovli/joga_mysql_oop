@@ -1,4 +1,3 @@
-// /oop/joga_mysql_oop/models/user.js
 const BaseSQLModel = require('./base');
 
 class User extends BaseSQLModel {
@@ -11,16 +10,21 @@ class User extends BaseSQLModel {
     }
 
     async create(data) {
-        return await super.create(data);
-    }
-    //kasutajanime kontroll
-    async findByUsername(username) {
-    const sql = 'SELECT * FROM users WHERE username = ? LIMIT 1';
-    const result = await this.executeQuery(sql, [username]);
-    const rows = Array.isArray(result) ? result[0] : [];
-    return rows || null;
-}
+        const userData = {
+            username: data.username,
+            password: data.password,
+            email: data.email,
+            role: data.role || 'user' // default roll 'user'
+        };
 
+        return await super.create(userData);
+    }
+
+    async findByUsername(username) {
+        const sql = 'SELECT * FROM users WHERE username = ? LIMIT 1';
+        const [rows] = await this.executeQuery(sql, [username]);
+        return rows || null;
+    }
 }
 
 module.exports = User;
