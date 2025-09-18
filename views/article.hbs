@@ -1,0 +1,10 @@
+<h1>{{article.name}}</h1>
+<p><strong>Autor ID:</strong> {{article.author_id}}</p>
+<p>{{article.body}}</p>
+
+{{#if article.image}}
+    <img src="/images/{{article.image}}" alt="{{article.name}}" style="max-width:300px;">
+{{/if}}
+
+<p><strong>Kuupäev:</strong> {{article.published}}</p>
+<a href="/articles">⬅ Tagasi kõikide artiklite juurde</a>

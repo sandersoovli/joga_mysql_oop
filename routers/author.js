@@ -1,14 +1,10 @@
-const experss = require('express');
-const router = experss.Router();
+const express = require('express');
+const router = express.Router();
 
-const ArticleControllerClass = require('../controllers/author');
-const AuthorController = new ArticleControllerClass();
+const AuthorControllerClass = require('../controllers/author');
+const AuthorController = new AuthorControllerClass();
 
-// GET /articles - get all articles
-router.get('/author/:author_id', (req, res) =>{
-    AuthorController.getAllAuthorbyId(req, res)
-});
-
-
+// GET /author/:author_id → render autor ja tema artiklid
+router.get('/:author_id', (req, res) => AuthorController.renderAuthor(req, res));
 
 module.exports = router;
